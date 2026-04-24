@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/SajeelWaien/bloom-filter-go/bloomfilter"
 	"github.com/google/uuid"
+	"github.com/sajeelwaien/consistent-hashing/bloomfilter"
 )
 
 func main() {
