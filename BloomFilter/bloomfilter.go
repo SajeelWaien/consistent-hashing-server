@@ -55,12 +55,13 @@ func NewBloomFilter(size int) *BloomFilter {
 
 var hashFunc []hash.Hash32
 
-func InitHashFunc(size int) {
+func InitHashFunc(size int) []hash.Hash32 {
 	for i := 0; i < size; i++ {
 		// seed := uint32(rand.Int31())
 		// hashFunc = append(hashFunc, murmur3.New32WithSeed(seed))
 		hashFunc = append(hashFunc, murmur3.New32WithSeed(uint32(i)))
 	}
+	return hashFunc
 }
 
 func hashKey(key string, bfSize int, hasher hash.Hash32) uint32 {
