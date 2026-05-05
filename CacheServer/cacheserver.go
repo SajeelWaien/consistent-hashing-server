@@ -16,17 +16,17 @@ type CacheServer struct {
 	bloomFilter *bloomfilter.BloomFilter
 }
 
-func NewCacheServer(hashFunction hash.Hash64, nodeCount int) *CacheServer {
+func NewCacheServer(hashFunction hash.Hash64, nodeCount int, replicationFactor int8, virtualNodeCount int8) *CacheServer {
 	if nodeCount <= 0 {
 		return nil
 	}
 
-	bloomFilter := bloomfilter.NewBloomFilter(500, bloomfilter.InitHashFunc(3))
+	bloomFilter := bloomfilter.NewBloomFilter(500, bloomfilter.InitHashFunc(3, hashFunction))
 
 	hashRing := hashring.NewHashRing(
 		hashring.WithHashFunction(hashFunction),
-		hashring.WithReplicationFactor(2),
-		hashring.WithVirtualNodeCount(5),
+		hashring.WithReplicationFactor(replicationFactor),
+		hashring.WithVirtualNodeCount(virtualNodeCount),
 		hashring.WithLoggingEnabled(true),
 	)
 

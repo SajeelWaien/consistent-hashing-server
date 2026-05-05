@@ -3,14 +3,12 @@ package bloomfilter
 import (
 	"fmt"
 	"hash"
-
-	"github.com/spaolacci/murmur3"
 )
 
 type BloomFilter struct {
 	filter   []uint8
 	size     int
-	hashFunc []hash.Hash32
+	hashFunc []hash.Hash64
 }
 
 type OptionFunc func(*BloomFilter)
@@ -61,21 +59,21 @@ func NewBloomFilter(size int, opts ...OptionFunc) *BloomFilter {
 	return filter
 }
 
-func InitHashFunc(size int) OptionFunc {
-	hashFunc := make([]hash.Hash32, 0)
+func InitHashFunc(size int, hasher hash.Hash64) OptionFunc {
+	hashFunc := make([]hash.Hash64, 0)
 	for i := 0; i < size; i++ {
-		// seed := uint32(rand.Int31())
+		// seed := uint64(rand.Int31())
 		// hashFunc = append(hashFunc, murmur3.New32WithSeed(seed))
-		hashFunc = append(hashFunc, murmur3.New32WithSeed(uint32(i)))
+		hashFunc = append(hashFunc, hasher)
 	}
 	return func(bf *BloomFilter) {
 		bf.hashFunc = hashFunc
 	}
 }
 
-func hashKey(key string, bfSize int, hasher hash.Hash32) uint32 {
+func hashKey(key string, bfSize int, hasher hash.Hash64) uint64 {
 	hasher.Reset()
 	hasher.Write([]byte(key))
-	result := hasher.Sum32() % uint32(bfSize*8)
+	result := hasher.Sum64() % uint64(bfSize*8)
 	return result
 }
