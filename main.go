@@ -14,49 +14,48 @@ package main
 // 	}
 
 // 	hashFunc := bloomfilter.InitHashFunc(3)
-// 	bf := bloomfilter.NewBloomFilter(50)
+// 	bf := bloomfilter.NewBloomFilter(50, hashFunc)
 
 // 	for i := 0; i < len(values); i++ {
-// 		bf.Add(values[i], &hashFunc)
+// 		bf.Add(values[i])
 // 	}
 
 // 	bf.Print("test")
-// 	fmt.Println(bf.Contains(uuid.NewString(), &hashFunc))
-// 	fmt.Println(values[5], bf.Contains(values[5], &hashFunc))
+// 	fmt.Println(bf.Contains(uuid.NewString()))
+// 	fmt.Println(values[5], bf.Contains(values[5]))
 // }
 
 import (
-	"fmt"
-
-	"github.com/sajeelwaien/consistent-hashing/hashring"
-	"github.com/sajeelwaien/consistent-hashing/node"
+	cacheServer "github.com/sajeelwaien/consistent-hashing/CacheServer"
 )
 
 func main() {
-	cacheNode1 := node.NewNode("Node1")
-	cacheNode2 := node.NewNode("Node2")
-	cacheNode3 := node.NewNode("Node3")
+	server := cacheServer.NewCacheServer(nil, 3)
 
-	rf := hashring.WithReplicationFactor(2)
-	vnc := hashring.WithVirtualNodeCount(5)
-	le := hashring.WithLoggingEnabled(true)
+	// cacheNode1 := node.NewNode("Node1")
+	// cacheNode2 := node.NewNode("Node2")
+	// cacheNode3 := node.NewNode("Node3")
 
-	hashRing := hashring.NewHashRing(rf, vnc, le)
+	// rf := hashring.WithReplicationFactor(2)
+	// vnc := hashring.WithVirtualNodeCount(5)
+	// le := hashring.WithLoggingEnabled(true)
 
-	hashRing.AddNode(cacheNode1)
-	hashRing.AddNode(cacheNode2)
-	hashRing.AddNode(cacheNode3)
+	// hashRing := hashring.NewHashRing(rf, vnc, le)
 
-	ringNode, err := hashRing.GetPrimaryNode("key1")
-	if err != nil {
-		fmt.Println("Error:", err)
-		return
-	}
-	fmt.Printf("Primary node for key1: %v\n", ringNode.GetID())
-	// for _, node := range ringNodes {
-	// 	fmt.Printf("Node for key1: %v\n", node.GetID())
+	// hashRing.AddNode(cacheNode1)
+	// hashRing.AddNode(cacheNode2)
+	// hashRing.AddNode(cacheNode3)
+
+	// ringNode, err := hashRing.GetPrimaryNode("key1")
+	// if err != nil {
+	// 	fmt.Println("Error:", err)
+	// 	return
 	// }
+	// fmt.Printf("Primary node for key1: %v\n", ringNode.GetID())
+	// // for _, node := range ringNodes {
+	// // 	fmt.Printf("Node for key1: %v\n", node.GetID())
+	// // }
 
-	fmt.Println(cacheNode1.GetID())
+	// fmt.Println(cacheNode1.GetID())
 
 }

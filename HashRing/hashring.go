@@ -29,6 +29,12 @@ type HashRingConfig struct {
 
 type HashRingConfigFunc func(*HashRingConfig)
 
+func WithHashFunction(hashFunc hash.Hash64) HashRingConfigFunc {
+	return func(config *HashRingConfig) {
+		config.HashFunction = hashFunc
+	}
+}
+
 func WithReplicationFactor(replicas int8) HashRingConfigFunc {
 	return func(config *HashRingConfig) {
 		config.NumberOfReplicas = replicas

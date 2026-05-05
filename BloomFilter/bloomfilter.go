@@ -8,13 +8,16 @@ import (
 )
 
 type BloomFilter struct {
-	filter []uint8
-	size   int
+	filter   []uint8
+	size     int
+	hashFunc []hash.Hash32
 }
 
-func (b *BloomFilter) Add(key string, hasherArr *[]hash.Hash32) {
-	for i := range len(*hasherArr) {
-		index := hashKey(key, len(b.filter), (*hasherArr)[i])
+type OptionFunc func(*BloomFilter)
+
+func (b *BloomFilter) Add(key string) {
+	for i := range len(b.hashFunc) {
+		index := hashKey(key, len(b.filter), b.hashFunc[i])
 		aIndex := index / 8
 		bIndex := index % 8
 		b.filter[aIndex] = b.filter[aIndex] | (1 << uint8(bIndex))
@@ -22,9 +25,9 @@ func (b *BloomFilter) Add(key string, hasherArr *[]hash.Hash32) {
 	}
 }
 
-func (b *BloomFilter) Contains(key string, hasherArr *[]hash.Hash32) bool {
-	for i := range len(*hasherArr) {
-		index := hashKey(key, len(b.filter), (*hasherArr)[i])
+func (b *BloomFilter) Contains(key string) bool {
+	for i := range len(b.hashFunc) {
+		index := hashKey(key, len(b.filter), b.hashFunc[i])
 		aIndex := index / 8
 		bIndex := index % 8
 		// fmt.Printf("CONTAINS: index: %d, aIndex: %d, bIndex: %d, bytes: %08b\n", index, aIndex, bIndex, b.filter[aIndex])
@@ -44,24 +47,30 @@ func (b *BloomFilter) Print(key string) {
 	fmt.Println()
 }
 
-func NewBloomFilter(size int) *BloomFilter {
+func NewBloomFilter(size int, opts ...OptionFunc) *BloomFilter {
 	filter := &BloomFilter{
-		make([]uint8, size),
-		size,
+		filter:   make([]uint8, size),
+		size:     size,
+		hashFunc: nil,
+	}
+
+	for _, opt := range opts {
+		opt(filter)
 	}
 
 	return filter
 }
 
-var hashFunc []hash.Hash32
-
-func InitHashFunc(size int) []hash.Hash32 {
+func InitHashFunc(size int) OptionFunc {
+	hashFunc := make([]hash.Hash32, 0)
 	for i := 0; i < size; i++ {
 		// seed := uint32(rand.Int31())
 		// hashFunc = append(hashFunc, murmur3.New32WithSeed(seed))
 		hashFunc = append(hashFunc, murmur3.New32WithSeed(uint32(i)))
 	}
-	return hashFunc
+	return func(bf *BloomFilter) {
+		bf.hashFunc = hashFunc
+	}
 }
 
 func hashKey(key string, bfSize int, hasher hash.Hash32) uint32 {
